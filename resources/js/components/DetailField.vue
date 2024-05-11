@@ -7,7 +7,7 @@
             >
                 {{ current }}
                 <light-box :index="selected" :images="images" />
-                <ul class="flex flex-wrap image-list -mt-4">
+                <div class="grid content-start gap-1 grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10">
                     <FieldImage
                         v-for="(image, index) in images"
                         :image="image"
@@ -15,7 +15,7 @@
                         readonly
                         @click="select(index)"
                     />
-                </ul>
+                </div>
             </div>
             <div class="image-gallery-field" v-else>-</div>
         </template>

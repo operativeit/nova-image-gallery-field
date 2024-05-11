@@ -12,7 +12,8 @@ use Laravel\Nova\Fields\Attachments\PendingAttachment;
 
 function createRequestWithFile(UploadedFile $file, array $parameters = [])
 {
-    return new class($file, $parameters) extends Request {
+    return new class($file, $parameters) extends Request
+    {
         public function __construct(UploadedFile $file, array $parameters)
         {
             parent::__construct(files: ['attachment' => $file], query: $parameters);
@@ -48,7 +49,7 @@ it('requires a draftId', function () {
     ]));
 })->throws(ValidationException::class, 'The draft id field is required.');
 
-it('stores the attachment and returns a json with the url and model id', function () {
+it('stores the attachment and returns a json with the url, thumb_url, type, mime_type and model id', function () {
     Storage::fake('public');
 
     $field = new ImageGalleryField('content');
@@ -75,5 +76,3 @@ it('stores the attachment and returns a json with the url and model id', functio
         ->and($response)->toContain(sprintf('{"url":"\/storage\/%s","id":%s}', str_replace('/', '\/', $attachment->attachment), $attachment->id));
 
 });
-
-

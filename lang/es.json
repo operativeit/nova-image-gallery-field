@@ -1,0 +1,10 @@
+{
+   "novaImageGalleryField.dragToReposition": "arrastrar para reordenar",
+   "novaImageGalleryField.browseFiles": "buscar archivos",
+   "novaImageGalleryField.dragAndDropFilesHere": "arrastrar y soltar sus archivos aquí o ",
+   "novaImageGalleryField.confirmTitle": "Borrar archivo",
+   "novaImageGalleryField.confirmButtonText": "Borrar",
+   "novaImageGalleryField.cancelButtonText": "Cancelar",
+   "novaImageGalleryField.confirmText": "¿Seguro que quierre borrar este item?"
+}
+

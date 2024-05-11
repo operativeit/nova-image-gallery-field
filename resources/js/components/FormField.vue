@@ -1,5 +1,9 @@
 <template>
-    <DefaultField :field="field" :show-help-text="false" full-width-content>
+    <DefaultField
+        :field="field"
+        :show-help-text="false"
+        full-width-content
+    >
         <template #field>
             <div class="image-gallery-field">
                 <div :class="{ dark: dark }">
@@ -11,7 +15,7 @@
                             type="file"
                             class="absolute w-full h-full opacity-0 cursor-pointer"
                             @change="validateImage"
-                            accept="image/jpg,image/jpeg,image/png,jpg,png"
+                            :accept="acceptFiles"
                             multiple
                         />
 
@@ -46,11 +50,11 @@
                             <div
                                 class="font-semibold text-gray-900 dark:text-gray-200"
                             >
-                                <span class="hidden md:inline"
-                                    >Drag &amp; Drop your files here or
+                                <span class="hidden md:inline">
+                                 {{ __('novaImageGalleryField.dragAndDropFilesHere') }}
                                 </span>
                                 <span class="text-primary-500">
-                                    Browse Files
+                                     {{ __('novaImageGalleryField.browseFiles') }}
                                 </span>
                             </div>
 
@@ -94,7 +98,7 @@
                         </div>
                     </div>
                     <div v-if="hasImages">
-                        <ul class="flex flex-wrap image-list">
+                        <div class="grid content-start gap-1 grid-cols-2 md:grid-cols-4 lg:grid-cols-6 xl:grid-cols-8 2xl:grid-cols-10 image-list">
                             <FieldImage
                                 v-for="(image, index) in visibleImages"
                                 :image="image"
@@ -105,7 +109,7 @@
                                     markImageForDeletion(image.id)
                                 "
                             />
-                        </ul>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -114,7 +118,7 @@
 </template>
 
 <script>
-import { FormField, HandlesValidationErrors } from "laravel-nova";
+import { FormField, HandlesValidationErrors, Localization } from "laravel-nova";
 import FieldImage from "./FieldImage.vue";
 import uniqid from "uniqid";
 import Sortable from "sortablejs";
@@ -125,13 +129,19 @@ export default {
         FieldImage,
     },
 
-    mixins: [FormField, HandlesValidationErrors],
+    mixins: [FormField, HandlesValidationErrors, Localization],
 
     props: ["resourceName", "resourceId", "field"],
 
-    data: () => ({
-        draftId: uuidv4(),
-    }),
+    data() {
+        return {
+            draftId: uuidv4(),
+            sortable: null,
+            busy: false,
+            dark: false,
+            documentMutationObserver: null,
+        };
+    },
 
     methods: {
         setInitialValue() {
@@ -183,13 +193,15 @@ export default {
 
                 const fileId = uniqid();
 
-                this.value.push({
+                let value = {
                     id: fileId,
                     url: URL.createObjectURL(file),
+                    type: file.type.includes("image/") ? "image" : "video", // for default display
                     busy: true,
                     order: orderStart + index + 1,
                     new: true,
-                });
+                };
+                this.value.push(value);
 
                 try {
                     const response = await Nova.request().post(
@@ -199,13 +211,16 @@ export default {
 
                     // Its counterintuitive but `response.data.url` contains a
                     // JSON string with the url and the media id.
-                    const { url, id } = JSON.parse(response.data.url);
+                    const { url, id, thumb_url, type, mime_type } = JSON.parse(response.data.url);
 
                     const valueIndex = this.value.findIndex(
                         (v) => v.id === fileId
                     );
                     this.value.splice(valueIndex, 1, {
                         url,
+                        thumb_url,
+                        type,
+                        mime_type,                      
                         id,
                         order: this.value[valueIndex].order,
                         new: true,
@@ -301,15 +316,10 @@ export default {
         deletedImages() {
             return (this.value || []).filter((image) => image.delete);
         },
-    },
 
-    data() {
-        return {
-            sortable: null,
-            busy: false,
-            dark: false,
-            documentMutationObserver: null,
-        };
+        acceptFiles() {
+            return this.field.accept || 'image/jpg,image/jpeg,image/png,jpg,png'
+        }
     },
 
     watch: {
@@ -354,3 +364,9 @@ function uuidv4() {
     );
 }
 </script>
+<style>
+
+.modal p {
+  padding-bottom: 2rem !important;
+}
+</style>

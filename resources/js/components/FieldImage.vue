@@ -1,5 +1,5 @@
 <template>
-    <li class="relative group mr-4 mt-4 image-list-item w-36">
+    <div class="relative group mr-4 mt-4 image-list-item h-auto max-w-full">
         <div
             v-if="busy"
             v-cloak
@@ -40,12 +40,25 @@
                 'cursor-pointer': !busy,
             }"
         >
-            <img
+            <img v-if="type === 'image' "
                 class="object-cover object-center w-full h-full"
                 :src="imageUrl"
             />
+            <img
+                v-if="(type === 'video' || type=== 'pdf') && imageThumbnailUrl"
+                class="object-cover object-center w-full h-full"
+                :src="imageThumbnailUrl"
+            />
+            <div
+                v-else
+                class="flex items-center justify-center w-full h-full bg-theme-secondary-900">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="w-12 h-12">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.91 11.672a.375.375 0 010 .656l-5.603 3.113a.375.375 0 01-.557-.328V8.887c0-.286.307-.466.557-.327l5.603 3.112z" />
+                </svg>
+            </div>
         </div>
-
+        <span>{{ type }}</span>
         <span v-if="error" class="text-red-500 text-xs flex">{{ error }}</span>
 
         <div
@@ -71,8 +84,8 @@
                     ></path>
                 </svg>
 
-                <p class="mt-3 text-xs font-semibold text-gray-500">
-                    Drag to reposition
+                <p class="mt-3 text-xs font-semibold text-center text-gray-500">
+                    {{ __('novaImageGalleryField.dragToReposition') }} 
                 </p>
             </div>
 
@@ -80,7 +93,7 @@
                 type="button"
                 data-action=""
                 class="absolute top-0 right-0 p-1 -mt-2 -mr-2 rounded cursor-pointer bg-red-100 text-red-500"
-                @click="deleteButtonHandler"
+                @click="modal.show=true"
             >
                 <svg
                     class="fill-current w-4 h-4"
@@ -101,7 +114,8 @@
                 </svg>
             </button>
         </div>
-    </li>
+        <ConfirmActionModal :show="modal.show" @confirm="deleteButtonHandler" @close="modal.show=false" :action="modal.action" />
+    </div>
 </template>
 
 <script>
@@ -120,13 +134,33 @@ export default {
             default: false,
         },
     },
-
+    data() {
+        return {
+           modal: {
+               show: false,
+               action: {
+                     name: this.__('novaImageGalleryField.confirmTitle'),
+                     confirmText:  this.__('novaImageGalleryField.confirmText'),
+                     cancelButtonText: this.__('novaImageGalleryField.cancelButtonText'),
+                     confirmButtonText: this.__('novaImageGalleryField.confirmButtonText'),
+                     destructive: true,
+                     fields: [],
+               }
+           },
+        };
+    },
     computed: {
+        type() {
+            return this.image.type;
+        },
         isNewFile() {
             return this.image.new;
         },
         imageUrl() {
             return this.image.url;
+        },
+        imageThumbnailUrl() {
+            return this.image.thumb_url;
         },
         error() {
             return this.image.error;

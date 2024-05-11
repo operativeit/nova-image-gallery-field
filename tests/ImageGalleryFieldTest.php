@@ -11,7 +11,8 @@ use Tests\Fixtures\ExampleModel;
 
 function createNovaRequest(array $files = [], array $parameters = [])
 {
-    return new class($parameters, $files) extends NovaRequest {
+    return new class($parameters, $files) extends NovaRequest
+    {
         public function __construct(array $parameters, array $files)
         {
             parent::__construct(files: $files, query: $parameters);
@@ -49,14 +50,14 @@ it('accepts custom single image rules messages', function () {
     $field = new ImageGalleryField('content');
 
     $field->rulesMessages([
-        'mimes'      => 'You must use a valid jpeg, png, jpg or gif image.',
-        'max'        => 'The image must be less than 5MB.',
+        'mimes' => 'You must use a valid jpeg, png, jpg or gif image.',
+        'max' => 'The image must be less than 5MB.',
         'dimensions' => 'The image must be at least 150px wide and 150px tall.',
     ]);
 
     expect($field->imageRulesMessages)->toBe([
-        'mimes'      => 'You must use a valid jpeg, png, jpg or gif image.',
-        'max'        => 'The image must be less than 5MB.',
+        'mimes' => 'You must use a valid jpeg, png, jpg or gif image.',
+        'max' => 'The image must be less than 5MB.',
         'dimensions' => 'The image must be at least 150px wide and 150px tall.',
     ]);
 });
@@ -86,9 +87,12 @@ it('returns an array with the media library info', function () {
 
     $value = $images->map(function ($image, $index) {
         return [
-            'id'    => $image->id,
-            'url'   => $image->getUrl(),
-            'order' => $index,
+            'id'        => $image->id,
+            'url'       => $image->getUrl(),
+            'order'     => $index,
+            'type'      => 'image',
+            'mime_type' => 'image/png',
+            'thumb_url' => null,
         ];
     })->toArray();
 
@@ -110,10 +114,10 @@ it('stores the new images in the given order', function () {
         return ['hash_name' => $image->store('/', ['disk' => 'public']), 'original_name' => $image->name];
     })->map(function (array $imageArray) {
         return PendingAttachment::create([
-            'draft_id'      => 'abc',
-            'attachment'    => $imageArray['hash_name'],
+            'draft_id' => 'abc',
+            'attachment' => $imageArray['hash_name'],
             'original_name' => $imageArray['original_name'],
-            'disk'          => 'public',
+            'disk' => 'public',
         ]);
     });
 
@@ -121,13 +125,13 @@ it('stores the new images in the given order', function () {
     $newImagesIds = $newImages->pluck('id')->map(fn ($id) => (string) $id);
 
     // The order for the new images contain a `new:` prefix
-    $imageOrderIds        = [$newImagesIds->get(1), $newImagesIds->get(0), $newImagesIds->get(2)];
+    $imageOrderIds = [$newImagesIds->get(1), $newImagesIds->get(0), $newImagesIds->get(2)];
     $imageOrderWithPrefix = collect($imageOrderIds)->map(fn ($id) => "new:{$id}")->toArray();
 
     $request = createNovaRequest(parameters: [
-        'images'        => $newImagesIds->toArray(),
+        'images' => $newImagesIds->toArray(),
         'images_delete' => [],
-        'images_order'  => $imageOrderWithPrefix,
+        'images_order' => $imageOrderWithPrefix,
     ]);
 
     $field->fillInto(request: $request, model: $model, attribute: 'images');
@@ -155,12 +159,12 @@ it('stores the previously added images in the given order', function () {
     $imagesId = $images->pluck('id')->map(fn ($id) => (string) $id);
 
     // The order for the new images contain a `new:` prefix
-    $imageOrderIds        = [$imagesId->get(1), $imagesId->get(0), $imagesId->get(2)];
+    $imageOrderIds = [$imagesId->get(1), $imagesId->get(0), $imagesId->get(2)];
 
     $request = createNovaRequest(parameters: [
-        'images'        => [],
+        'images' => [],
         'images_delete' => [],
-        'images_order'  => $imageOrderIds,
+        'images_order' => $imageOrderIds,
     ]);
 
     $field->fillInto(request: $request, model: $model, attribute: 'images');
@@ -191,9 +195,9 @@ it('deletes the given images to delete', function () {
     $imagesToDeleteId = [$imagesId->get(2), $imagesId->get(0)];
 
     $request = createNovaRequest(parameters: [
-        'images'        => [],
+        'images' => [],
         'images_delete' => $imagesToDeleteId,
-        'images_order'  => [],
+        'images_order' => [],
     ]);
 
     $field->fillInto(request: $request, model: $model, attribute: 'images');
@@ -217,10 +221,10 @@ it('creates and stores images with correct name and path', function () {
         return ['hash_name' => $image->store('/', ['disk' => 'public']), 'original_name' => $image->name];
     })->map(function (array $imageArray) {
         return PendingAttachment::create([
-            'draft_id'      => 'abc',
-            'attachment'    => $imageArray['hash_name'],
+            'draft_id' => 'abc',
+            'attachment' => $imageArray['hash_name'],
             'original_name' => $imageArray['original_name'],
-            'disk'          => 'public',
+            'disk' => 'public',
         ]);
     });
 
@@ -228,13 +232,13 @@ it('creates and stores images with correct name and path', function () {
     $newImagesIds = $newImages->pluck('id')->map(fn ($id) => (string) $id);
 
     // The order for the new images contain a `new:` prefix
-    $imageOrderIds        = [$newImagesIds->get(1), $newImagesIds->get(0), $newImagesIds->get(2)];
+    $imageOrderIds = [$newImagesIds->get(1), $newImagesIds->get(0), $newImagesIds->get(2)];
     $imageOrderWithPrefix = collect($imageOrderIds)->map(fn ($id) => "new:{$id}")->toArray();
 
     $request = createNovaRequest(parameters: [
-        'images'        => $newImagesIds->toArray(),
+        'images' => $newImagesIds->toArray(),
         'images_delete' => [],
-        'images_order'  => $imageOrderWithPrefix,
+        'images_order' => $imageOrderWithPrefix,
     ]);
 
     $field->fillInto(request: $request, model: $model, attribute: 'images');
@@ -251,7 +255,7 @@ it('creates and stores images with correct name and path', function () {
 
         // Assert the file name
         $imageFilePath = Storage::disk('public')->path($filePath);
-        $fileName      = pathinfo($imageFilePath, PATHINFO_BASENAME);
+        $fileName = pathinfo($imageFilePath, PATHINFO_BASENAME);
 
         expect($fileName)->toBe($image['file_name']);
     });

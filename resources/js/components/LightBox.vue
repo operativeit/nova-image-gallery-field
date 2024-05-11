@@ -12,7 +12,7 @@
         </div>
         <div class="flex">
             <div
-                class="cursor-pointer self-center px-8"
+                class="cursor-pointer self-center px-1"
                 @click.stop="prev"
                 :class="{ invisible: !hasPrev() }"
             >
@@ -20,8 +20,8 @@
                     class="pointer-events-none"
                     fill="#fff"
                     height="48"
-                    viewBox="0 0 24 24"
-                    width="48"
+                    viewBox="6 0 12 24"
+                    width="24"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <path
@@ -30,14 +30,21 @@
                     <path d="M0-.5h24v24H0z" fill="none" />
                 </svg>
             </div>
-            <div class="lightbox-image" @click.stop="">
+            <div class="lightbox-image" @click.stop="" v-touch:swipe.right="prev" v-touch:swipe.left="next" v-scroll-lock="visible">
                 <img
+                    v-if="images[localIndex].type === 'image'"
                     :src="images[localIndex].url"
                     class="rounded-xl w-auto h-auto"
                 />
+                <video v-else controls autoplay playsinline class="rounded-xl w-auto h-[95vh]">
+                    <source
+                        :src="images[localIndex].url"
+                        :type="images[localIndex].mime_type"
+                    />
+                </video>
             </div>
             <div
-                class="cursor-pointer self-center px-8"
+                class="cursor-pointer self-center px-1"
                 @click.stop="next"
                 :class="{ invisible: !hasNext() }"
             >
@@ -45,8 +52,8 @@
                     class="pointer-events-none"
                     fill="#fff"
                     height="48"
-                    viewBox="0 0 24 24"
-                    width="48"
+                    viewBox="6 0 12 24"
+                    width="24"
                     xmlns="http://www.w3.org/2000/svg"
                 >
                     <path
@@ -60,6 +67,7 @@
 </template>
 
 <script>
+
 export default {
     props: {
         images: {
@@ -125,7 +133,7 @@ export default {
                         break;
                 }
             }
-        },
+        }
     },
     mounted() {
         window.addEventListener("keydown", this.onKeydown);

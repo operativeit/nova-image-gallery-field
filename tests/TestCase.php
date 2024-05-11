@@ -21,7 +21,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     public function getEnvironmentSetUp(
         $app
@@ -29,14 +29,14 @@ abstract class TestCase extends Orchestra
         config()->set('database.default', 'sqlite');
 
         config()->set('database.connections.sqlite', [
-            'driver'   => 'sqlite',
+            'driver' => 'sqlite',
             'database' => ':memory:',
-            'prefix'   => '',
+            'prefix' => '',
         ]);
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function setUpNovaAttachmentsTables($app)
     {
@@ -63,7 +63,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function setUpExampleModelTable($app)
     {
@@ -74,7 +74,7 @@ abstract class TestCase extends Orchestra
     }
 
     /**
-     * @param \Illuminate\Foundation\Application $app
+     * @param  \Illuminate\Foundation\Application  $app
      */
     protected function setUpMediaLibrary($app)
     {

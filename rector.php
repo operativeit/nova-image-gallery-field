@@ -10,8 +10,8 @@ use Rector\Set\ValueObject\SetList;
 
 return static function (RectorConfig $rectorConfig): void {
     $parameters = $rectorConfig->parameters();
-    $services   = $rectorConfig->services();
-    $dir        = getcwd();
+    $services = $rectorConfig->services();
+    $dir = getcwd();
 
     $rectorConfig->sets([
         SetList::PRIVATIZATION,
